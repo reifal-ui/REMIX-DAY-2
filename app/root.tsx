@@ -1,45 +1,67 @@
 import {
   Links,
+  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
+  useRouteError,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
-
-import "./tailwind.css";
+import './styles/tailwind.css';
 
 export const links: LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
+  { rel: "stylesheet", href: "/build/_assets/tailwind.css" },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-red-100 to-red-300 text-red-800 p-8">
+        <h1 className="text-6xl font-bold mb-4">Oops! {error.status}</h1>
+        <p className="text-2xl mb-2">{error.statusText}</p>
+        <p className="text-lg italic">Ada yang salah, tim kami sedang memperbaikinya!</p>
+      </div>
+    );
+  }
+
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-red-100 to-red-300 text-red-800 p-8">
+      <h1 className="text-6xl font-bold mb-4">Something went wrong</h1>
+      <p className="text-lg">Mohon maaf atas ketidaknyamanannya.</p>
+    </div>
   );
 }
 
+// ✅ App layout dengan header, main, footer, dan global styles
 export default function App() {
-  return <Outlet />;
+  return (
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body className="font-sans bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+        <header className="bg-white shadow-md p-4">
+          <h1 className="text-2xl font-semibold text-center">🚀 Remix App</h1>
+        </header>
+
+        <main className="flex-1 max-w-4xl mx-auto p-4">
+          <Outlet />
+        </main>
+
+        <footer className="bg-white shadow-inner p-4 text-center text-sm text-gray-500">
+          &copy; {new Date().getFullYear()} Remix App. All rights reserved.
+        </footer>
+
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
+      </body>
+    </html>
+  );
 }
